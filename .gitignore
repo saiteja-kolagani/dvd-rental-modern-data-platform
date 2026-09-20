@@ -1,0 +1,14 @@
+# Data Directory
+data/raw/*.csv
+
+# Logs Directory
+logs/*.log
+
+# Environment
+.venv/
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+*.py[cod]
