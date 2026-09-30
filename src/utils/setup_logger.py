@@ -61,5 +61,5 @@ def setup_logger_handler(file_path: str | None = None, level=logging.INFO) -> lo
         print(f"Failed to configure logger due to {error}")
         raise
 
-logger = setup_logger_handler()
+logger = setup_logger_handler() 
 
