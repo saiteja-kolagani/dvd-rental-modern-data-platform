@@ -2,6 +2,7 @@ from datetime import datetime
 from utils.setup_logger import logger
 from config.settings import validate_settings
 from ingestion.batch_manager import create_batch_context
+from ingestion.file_discovery import discover_csv_files
 
 def main():
 
@@ -15,6 +16,8 @@ def main():
     logger.info(f"Ingestion Date: {batch.ingestion_date}")
 
     validate_settings()
+
+    discover_csv_files()
 
 
 if __name__=="__main__":
