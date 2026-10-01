@@ -55,6 +55,8 @@ def setup_logger_handler(file_path: str | None = None, level=logging.INFO) -> lo
             force=True
         )
 
+        print('Logger confifured successfully.')
+
         return logging.getLogger(__name__)
 
     except Exception as error:

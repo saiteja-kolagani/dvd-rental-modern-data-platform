@@ -4,11 +4,11 @@ from pathlib import Path
 from botocore.exceptions import ClientError
 from utils.setup_logger import logger
 
-class s3Client:
+class S3Client:
     def __init__(self, region_name: str):
         self.client = boto3.client('s3', region_name=region_name)
 
-    def upload_file(self, local_path: Path, bucket: str, s3_key: str) -> None:
+    def upload_file_to_s3(self, local_path: Path, bucket: str, s3_key: str) -> None:
 
         file_path = Path(local_path)
         
