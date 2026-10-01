@@ -9,6 +9,8 @@ RAW_DATA_PATH = os.getenv('RAW_DATA_PATH')
 
 def validate_settings() -> None:
 
+    logger.info("Settings Validation Started...")
+
     try:
         required_settings = {
             'AWS_REGION': AWS_REGION,
@@ -23,6 +25,7 @@ def validate_settings() -> None:
             raise ValueError(f"missing required settings: {', '.join(missing_settings)}")
         else:
             logger.info("No missing reuired settings")
+            logger.info("Settings Validation completed successfully.")
             
 
     except Exception as error:
