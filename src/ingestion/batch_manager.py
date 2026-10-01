@@ -10,9 +10,13 @@ class BatchContext:
 
 def create_batch_context() -> BatchContext:
 
+    logger.info("Creating Batch Context...")
+
     ingestion_timestamp = datetime.now(timezone.utc)
     batch_id = f"{ingestion_timestamp.strftime('%Y%m%d_%H%M%S')}_dvdrental"
     ingestion_date = ingestion_timestamp.strftime('%Y-%m-%d')
+
+    logger.info("Successfully created batch context.")
 
     return BatchContext(
         ingestion_timestamp=ingestion_timestamp,
