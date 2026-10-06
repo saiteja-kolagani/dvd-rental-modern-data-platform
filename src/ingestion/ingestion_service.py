@@ -4,11 +4,17 @@ from src.config.settings import (
     AWS_REGION,
     S3_BRONZE_BUCKET,
     RAW_DATA_PATH,
+    POSTGRES_PASSWORD,
+    POSTGRES_USER,
+    POSTGRES_DATABASE,
+    POSTGRES_PORT,
+    POSTGRES_HOST,
     validate_settings
 )
 from src.ingestion.batch_manager import create_batch_context
 from src.ingestion.file_discovery import discover_csv_files
 from src.utils.s3_client import S3Client
+from src.utils.postgres_client import PostgreSQLClient
 
 
 def build_s3_key(file_path: Path, ingestion_date: str, batch_id: str) -> str:
@@ -36,22 +42,64 @@ def run_ingestion() -> None:
 
     s3_client = S3Client(region_name=AWS_REGION)
 
+    postgres_client = PostgreSQLClient(
+    host=POSTGRES_HOST,
+    port=POSTGRES_PORT,
+    database=POSTGRES_DATABASE,
+    user=POSTGRES_USER,
+    password=POSTGRES_PASSWORD,
+    )
+
     successful_files = 0
 
-    for file_path in files:
-        s3_key = build_s3_key(file_path=file_path, ingestion_date=batch.ingestion_date, batch_id=batch.batch_id)
+    try: 
+        for file_path in files:
+            s3_key = build_s3_key(file_path=file_path, ingestion_date=batch.ingestion_date, batch_id=batch.batch_id)
 
-        logger.info(f"Uploading {file_path.name} to s3://{S3_BRONZE_BUCKET}/{s3_key}")
+            logger.info(f"Uploading {file_path.name} to s3://{S3_BRONZE_BUCKET}/{s3_key}")
 
-        try:
-            s3_client.upload_file_to_s3(local_path=file_path, bucket=S3_BRONZE_BUCKET, s3_key=s3_key)
-            successful_files += 1
-            logger.info(f"Successfully uploaded {file_path.name} to S3")
-        except Exception:
-            logger.exception(f"Failed to upload {file_path.name}")
+            try:
+                s3_client.upload_file_to_s3(local_path=file_path, bucket=S3_BRONZE_BUCKET, s3_key=s3_key)
 
-    logger.info(f"Batch completed: {successful_files}/{len(files)} files uploaded to S3 successfully.")
+                file_size_bytes = file_path.stat().st_size
 
+                postgres_client.insert_ingestion_metadata(
+                    batch_id=batch.batch_id,
+                    ingestion_timestamp=batch.ingestion_timestamp,
+                    ingestion_date=batch.ingestion_date,
+                    source_system="DVD_RENTAL",
+                    source_file=file_path.name,
+                    source_table=file_path.stem,
+                    s3_bucket=S3_BRONZE_BUCKET,
+                    s3_key=s3_key,
+                    file_size_bytes=file_size_bytes,
+                    status="SUCCESS"
+                )
+
+                successful_files += 1
+
+                logger.info(f"Successfully uploaded {file_path.name} to S3")
+
+            except Exception as exc:
+                logger.exception(f"Failed to upload {file_path.name}")
+
+                postgres_client.insert_ingestion_metadata(
+                    batch_id=batch.batch_id,
+                    ingestion_timestamp=batch.ingestion_timestamp,
+                    ingestion_date=batch.ingestion_date,
+                    source_system="DVD_RENTAL",
+                    source_file=file_path.name,
+                    source_table=file_path.stem,
+                    s3_bucket=S3_BRONZE_BUCKET,
+                    s3_key=s3_key,
+                    file_size_bytes=file_path.stat().st_size,
+                    status="FAILED",
+                    error_message=str(exc),
+                )
+    finally:
+        postgres_client.close()
+        logger.info(f"Batch completed: {successful_files}/{len(files)} files uploaded to S3 successfully.")
+    
     if successful_files != len(files):
         raise RuntimeError(
             f"Ingestion failed for one or more files"
