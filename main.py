@@ -1,5 +1,5 @@
-from utils.setup_logger import logger
-from ingestion.ingestion_service import run_ingestion
+from src.utils.setup_logger import logger
+from src.ingestion.ingestion_service import run_ingestion
 
 
 def main():

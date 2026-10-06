@@ -1,14 +1,14 @@
 from pathlib import Path
-from utils.setup_logger import logger
-from config.settings import (
+from src.utils.setup_logger import logger
+from src.config.settings import (
     AWS_REGION,
     S3_BRONZE_BUCKET,
     RAW_DATA_PATH,
     validate_settings
 )
-from ingestion.batch_manager import create_batch_context
-from ingestion.file_discovery import discover_csv_files
-from utils.s3_client import S3Client
+from src.ingestion.batch_manager import create_batch_context
+from src.ingestion.file_discovery import discover_csv_files
+from src.utils.s3_client import S3Client
 
 
 def build_s3_key(file_path: Path, ingestion_date: str, batch_id: str) -> str:

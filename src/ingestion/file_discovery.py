@@ -1,6 +1,6 @@
 import os
 
-from utils.setup_logger import logger
+from src.utils.setup_logger import logger
 from dotenv import load_dotenv
 from pathlib import Path
 

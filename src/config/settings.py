@@ -1,6 +1,6 @@
 import os
 
-from utils.setup_logger import logger
+from src.utils.setup_logger import logger
 
 
 AWS_REGION = os.getenv('AWS_REGION')
