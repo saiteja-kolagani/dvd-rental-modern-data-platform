@@ -1,4 +1,4 @@
-from utils.setup_logger import logger
+from src.utils.setup_logger import logger
 from datetime import datetime, timezone
 from dataclasses import dataclass
 
