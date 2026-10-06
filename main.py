@@ -4,7 +4,12 @@ from src.ingestion.ingestion_service import run_ingestion
 
 def main():
     logger.info("Pipeline Started...")
-    run_ingestion()
+    try:
+     run_ingestion()
+    except Exception as error:
+       logger.error(f"Pipeline failed due to {error}")
+    finally:
+       logger.info("DVD Rental Pipeline Completed Execution.")
 
 if __name__=="__main__":
     main()
