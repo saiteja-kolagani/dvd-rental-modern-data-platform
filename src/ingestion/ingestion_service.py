@@ -38,6 +38,11 @@ def run_ingestion() -> None:
 
     files = discover_csv_files(RAW_DATA_PATH)
 
+    if not files:
+        raise FileNotFoundError(
+            f"No CSV files found in {RAW_DATA_PATH}"
+        )
+
     logger.info(f"Discovered {len(files)} CSV files")
 
     s3_client = S3Client(region_name=AWS_REGION)
@@ -51,6 +56,7 @@ def run_ingestion() -> None:
     )
 
     successful_files = 0
+    failed_files = 0
 
     try: 
         for file_path in files:
@@ -81,21 +87,30 @@ def run_ingestion() -> None:
                 logger.info(f"Successfully uploaded {file_path.name} to S3")
 
             except Exception as exc:
+                failed_files += 1
                 logger.exception(f"Failed to upload {file_path.name}")
 
-                postgres_client.insert_ingestion_metadata(
-                    batch_id=batch.batch_id,
-                    ingestion_timestamp=batch.ingestion_timestamp,
-                    ingestion_date=batch.ingestion_date,
-                    source_system="DVD_RENTAL",
-                    source_file=file_path.name,
-                    source_table=file_path.stem,
-                    s3_bucket=S3_BRONZE_BUCKET,
-                    s3_key=s3_key,
-                    file_size_bytes=file_path.stat().st_size,
-                    status="FAILED",
-                    error_message=str(exc),
-                )
+                try:
+
+                    postgres_client.insert_ingestion_metadata(
+                        batch_id=batch.batch_id,
+                        ingestion_timestamp=batch.ingestion_timestamp,
+                        ingestion_date=batch.ingestion_date,
+                        source_system="DVD_RENTAL",
+                        source_file=file_path.name,
+                        source_table=file_path.stem,
+                        s3_bucket=S3_BRONZE_BUCKET,
+                        s3_key=s3_key,
+                        file_size_bytes=file_path.stat().st_size,
+                        status="FAILED",
+                        error_message=str(exc),
+                    )
+
+                except Exception:
+                    logger.exception(
+                        f"Unable to record FAILED metadata "
+                        f"for {file_path.name}"
+                    )
     finally:
         postgres_client.close()
         logger.info(f"Batch completed: {successful_files}/{len(files)} files uploaded to S3 successfully.")
@@ -104,6 +119,7 @@ def run_ingestion() -> None:
         raise RuntimeError(
             f"Ingestion failed for one or more files"
             f"Successful: {successful_files}/{len(files)}"
+            f"Failed: {failed_files}"
         )
 
     logger.info(f"Ingestion completed successfully. Batch ID: {batch.batch_id}")

@@ -8,8 +8,9 @@ def main():
      run_ingestion()
     except Exception as error:
        logger.error(f"Pipeline failed due to {error}")
-    finally:
-       logger.info("DVD Rental Pipeline Completed Execution.")
+       raise
+    else:
+       logger.info("DVD Rental Pipeline Completed Execution Successfully.")
 
 if __name__=="__main__":
     main()
