@@ -1,0 +1,72 @@
+
+# ==========================================
+# Terraform working directory
+# ==========================================
+.terraform/
+
+# ==========================================
+# Terraform state files
+# ==========================================
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+
+# Local state backups
+terraform-state-backup.json
+
+# ==========================================
+# Terraform plan files
+# ==========================================
+*.tfplan
+*.plan
+
+# ==========================================
+# Terraform variable files
+# ==========================================
+*.tfvars
+*.tfvars.json
+!example.tfvars
+!*.example.tfvars
+
+# ==========================================
+# Terraform override files
+# ==========================================
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# ==========================================
+# Terraform CLI configuration
+# ==========================================
+.terraformrc
+terraform.rc
+
+# ==========================================
+# Terraform crash logs
+# ==========================================
+crash.log
+crash.*.log
+
+# ==========================================
+# Credentials and secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.p12
+*.pfx
+
+credentials
+secrets.json
+
+# ==========================================
+# OS generated files
+# ==========================================
+.DS_Store
+Thumbs.db
+Desktop.ini
