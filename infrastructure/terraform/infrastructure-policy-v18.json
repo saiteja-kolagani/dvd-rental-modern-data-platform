@@ -1,0 +1,216 @@
+{
+    "Version":  "2012-10-17",
+    "Statement":  [
+                      {
+                          "Sid":  "TerraformEC2NetworkingAndCompute",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "ec2:CreateVpc",
+                                         "ec2:CreateInternetGateway",
+                                         "ec2:AttachInternetGateway",
+                                         "ec2:CreateSubnet",
+                                         "ec2:ModifySubnetAttribute",
+                                         "ec2:CreateRouteTable",
+                                         "ec2:CreateRoute",
+                                         "ec2:AssociateRouteTable",
+                                         "ec2:CreateSecurityGroup",
+                                         "ec2:AuthorizeSecurityGroupIngress",
+                                         "ec2:AuthorizeSecurityGroupEgress",
+                                         "ec2:ModifyVpcAttribute",
+                                         "ec2:RunInstances",
+                                         "ec2:CreateVolume",
+                                         "ec2:CreateNetworkInterface",
+                                         "ec2:CreateTags"
+                                     ],
+                          "Resource":  "*"
+                      },
+                      {
+                          "Sid":  "TerraformEC2Inspection",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "ec2:Describe*"
+                                     ],
+                          "Resource":  "*"
+                      },
+                      {
+                          "Sid":  "TerraformRDSProvisioning",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "rds:CreateDBSubnetGroup",
+                                         "rds:DescribeDBSubnetGroups",
+                                         "rds:CreateDBInstance",
+                                         "rds:DescribeDBInstances",
+                                         "rds:DescribeDBEngineVersions",
+                                         "rds:DescribeOrderableDBInstanceOptions",
+                                         "rds:AddTagsToResource",
+                                         "rds:ListTagsForResource"
+                                     ],
+                          "Resource":  "*"
+                      },
+                      {
+                          "Sid":  "TerraformSSMInstanceProfile",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "iam:CreateInstanceProfile",
+                                         "iam:TagInstanceProfile",
+                                         "iam:GetInstanceProfile",
+                                         "iam:AddRoleToInstanceProfile"
+                                     ],
+                          "Resource":  "arn:aws:iam::851382689558:instance-profile/dvd-rental-dev-ssm-ec2-profile"
+                      },
+                      {
+                          "Sid":  "TerraformPassSSMRoleToEC2",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "iam:PassRole"
+                                     ],
+                          "Resource":  "arn:aws:iam::851382689558:role/dvd-rental-dev-ssm-ec2-role",
+                          "Condition":  {
+                                            "StringEquals":  {
+                                                                 "iam:PassedToService":  "ec2.amazonaws.com"
+                                                             }
+                                        }
+                      },
+                      {
+                          "Sid":  "AllowRDSServiceLinkedRoleCreation",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "iam:CreateServiceLinkedRole"
+                                     ],
+                          "Resource":  "*",
+                          "Condition":  {
+                                            "StringEquals":  {
+                                                                 "iam:AWSServiceName":  "rds.amazonaws.com"
+                                                             }
+                                        }
+                      },
+                      {
+                          "Sid":  "AllowReadRDSServiceLinkedRole",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "iam:GetRole"
+                                     ],
+                          "Resource":  "arn:aws:iam::851382689558:role/aws-service-role/rds.amazonaws.com/AWSServiceRoleForRDS"
+                      },
+                      {
+                          "Sid":  "AllowIAMPolicyInspection",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "iam:ListAttachedUserPolicies",
+                                         "iam:ListUserPolicies",
+                                         "iam:GetUser",
+                                         "iam:GetPolicy",
+                                         "iam:GetPolicyVersion"
+                                     ],
+                          "Resource":  "*"
+                      },
+                      {
+                          "Sid":  "AllowRDSKMSAccess",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "kms:DescribeKey",
+                                         "kms:CreateGrant"
+                                     ],
+                          "Resource":  "arn:aws:kms:ap-south-1:851382689558:key/1048a9e2-cf7c-420d-851b-ee1a431b097c"
+                      },
+                      {
+                          "Sid":  "AllowRDSKMSInspectionAndGrantManagement",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "kms:DescribeKey",
+                                         "kms:ListGrants",
+                                         "kms:CreateGrant"
+                                     ],
+                          "Resource":  "arn:aws:kms:ap-south-1:851382689558:key/1048a9e2-cf7c-420d-851b-ee1a431b097c"
+                      },
+                      {
+                          "Sid":  "AllowSecretsManagerKMSAccess",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "kms:DescribeKey",
+                                         "kms:CreateGrant",
+                                         "kms:ListGrants"
+                                     ],
+                          "Resource":  "arn:aws:kms:ap-south-1:851382689558:key/c75182ac-f774-4879-a9b1-0074104c438a"
+                      },
+                      {
+                          "Sid":  "AllowDVDProjectKMSAccess",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "kms:DescribeKey",
+                                         "kms:ListGrants",
+                                         "kms:CreateGrant"
+                                     ],
+                          "Resource":  [
+                                           "arn:aws:kms:ap-south-1:851382689558:key/1048a9e2-cf7c-420d-851b-ee1a431b097c",
+                                           "arn:aws:kms:ap-south-1:851382689558:key/c75182ac-f774-4879-a9b1-0074104c438a"
+                                       ]
+                      },
+                      {
+                          "Sid":  "AllowKMSKeyPolicyInspection",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "kms:GetKeyPolicy"
+                                     ],
+                          "Resource":  [
+                                           "arn:aws:kms:ap-south-1:851382689558:key/1048a9e2-cf7c-420d-851b-ee1a431b097c",
+                                           "arn:aws:kms:ap-south-1:851382689558:key/c75182ac-f774-4879-a9b1-0074104c438a"
+                                       ]
+                      },
+                      {
+                          "Sid":  "AllowDVDProjectKMSKeyUsage",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "kms:DescribeKey",
+                                         "kms:CreateGrant",
+                                         "kms:ListGrants",
+                                         "kms:Encrypt",
+                                         "kms:Decrypt",
+                                         "kms:ReEncrypt*",
+                                         "kms:GenerateDataKey*"
+                                     ],
+                          "Resource":  [
+                                           "arn:aws:kms:ap-south-1:851382689558:key/1048a9e2-cf7c-420d-851b-ee1a431b097c",
+                                           "arn:aws:kms:ap-south-1:851382689558:key/c75182ac-f774-4879-a9b1-0074104c438a"
+                                       ]
+                      },
+                      {
+                          "Sid":  "AllowInfrastructurePolicyVersionManagement",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "iam:ListPolicyVersions",
+                                         "iam:CreatePolicyVersion",
+                                         "iam:SetDefaultPolicyVersion",
+                                         "iam:DeletePolicyVersion"
+                                     ],
+                          "Resource":  "arn:aws:iam::851382689558:policy/dvd-rental-modern-data-platform-infrastructure-policy"
+                      },
+                      {
+                          "Sid":  "AllowRDSManagedSecretCreation",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "secretsmanager:CreateSecret"
+                                     ],
+                          "Resource":  "*"
+                      },
+                      {
+                          "Sid":  "AllowRDSManagedSecretTagging",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "secretsmanager:TagResource"
+                                     ],
+                          "Resource":  "*"
+                      },
+                      {
+                          "Effect":  "Allow",
+                          "Sid":  "AllowDVDProjectSSMSessionManagement",
+                          "Resource":  "*",
+                          "Action":  [
+                                         "ssm:DescribeInstanceInformation",
+                                         "ssm:StartSession",
+                                         "ssm:TerminateSession",
+                                         "ssm:ResumeSession"
+                                     ]
+                      }
+                  ]
+}
